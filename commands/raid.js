@@ -28,7 +28,7 @@ exports.createRaid = function(message, args) {
     }
 }
 
-exports.announceRaid = function (raid) {
+exports.announceRaid = function (raid, config) {
     const channel = raid.channel;
     const owner = raid.owner;
     const when = raid.time;
@@ -39,7 +39,7 @@ exports.announceRaid = function (raid) {
     const embed = new Discord.MessageEmbed()
         .setColor("#FFA500")
         .setTitle("Raid created by: " + owner.username)
-        .setDescription("RSVP by clicking: ✅\nIf you cannot make it anymore click: ❌\n__*if you do ❌ but decides to go, your name won't show up here!*__")
+        .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
         .addField("Raid info",
                 "__When__: " + when + "\n"+
                 "__Where__: " + where + "\n"+
@@ -48,8 +48,8 @@ exports.announceRaid = function (raid) {
         .addField("Confirmed players", "no one :(");
 
     return channel.send({embed}).then( raidMessage => {
-        raidMessage.react("✅");
-        raidMessage.react("❌");
+        raidMessage.react(config.rsvp_emoji);
+        raidMessage.react(config.rsvp_emoji_cancel);
         raid.message = raidMessage;
         return raid;
     }).catch( err => {
@@ -57,8 +57,7 @@ exports.announceRaid = function (raid) {
     });
 }
 
-exports.timerRaid = function (raid) {
-    console.log('checkpoint 3.1');
+exports.timerRaid = function (raid, config) {
     const message = raid.message;
     const owner = raid.owner;
     const when = raid.time;
@@ -70,44 +69,35 @@ exports.timerRaid = function (raid) {
     var usersThatSaidNo = [];
 
     const collector = message.createReactionCollector(
-        (reaction, user) => reaction.emoji.name === "✅" || reaction.emoji.name === "❌",
+        (reaction, user) => reaction.emoji.name === config.rsvp_emoji || reaction.emoji.name === config.rsvp_emoji_cancel,
         { time: raid.timer*10000 }
     ); // convert to miliseconds
 
-    console.log('checkpoint 3.2');
-
     collector.on('collect', reaction => {
-        console.log('checkpoint 3.2.1');
-        if (reaction.emoji.name === "✅") {
+        if (reaction.emoji.name === config.rsvp_emoji) {
             usersThatSaidYes = Array.from(reaction.users.values());
-        }else if (reaction.emoji.name === "❌") {
+        }else if (reaction.emoji.name === config.rsvp_emoji_cancel) {
             usersThatSaidNo = Array.from(reaction.users.values());
         }
-        console.log('checkpoint 3.2.2');
         //update users in raid calling msg
         const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0 );
         let text = "> ";
         confirmedUsers.forEach(user => text += " " + user.username);
 
-        console.log('checkpoint 3.2.3', text);
-
         const embed = new Discord.MessageEmbed()
             .setColor("#FFA500")
             .setTitle("Raid created by: " + owner.username)
-            .setDescription("RSVP by clicking: ✅\nIf you cannot make it anymore click: ❌\n__*if you do ❌ but decides to go, your name won't show up here!*__")
+            .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
             .addField("Raid info",
                     "__When__: " + when + "\n"+
                     "__Where__: " + where + "\n"+
                     "__Deadline__: " + timer.toString() + " minutes\n"+
                     "__Quorum needed__: " + quorum.toString() + "\n")
             .addField("Confirmed players", text);
-        console.log('checkpoint 3.2.4');
         message.edit({embed}).catch( err => {
-                console.log('oops',err);
+                console.log(err);
         });
     });
-
-    console.log('checkpoint 3.3');
 
     collector.on('end', collectedItems => {
         const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0 );
@@ -126,7 +116,4 @@ exports.timerRaid = function (raid) {
             message.channel.send(text);
         }
     });
-    
-    console.log('checkpoint 3.4');
-    
 }

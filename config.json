@@ -1,6 +1,7 @@
 {
     "token": "MzkyODcwNTczNzQwNTIzNTIx.DRzYwQ.xdoCK4xysB5Vhs-9DIV0XWaSSiE",
     "prefix": "!",
+    "separator":"#",
     "rsvp_emoji":"✅",
-    "rsvp_emoji_cancel":":x:"
+    "rsvp_emoji_cancel":"❌"
 }

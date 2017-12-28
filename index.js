@@ -14,22 +14,19 @@ client.on('message', message => {
     if (message.author.bot) return;
 
     if (message.content.substring(0, 1) === prefix) {
-        const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-        const cmd = args.shift().toLowerCase();
+        var cmd = message.content.slice(config.prefix.length).trim().split(/ /gi, 1)[0];
+        var args = message.content.slice(cmd.length+config.prefix.length).trim().split(config.separator);
 
         switch(cmd) {
             // !help
             case 'help':
-                router.help(message);
+                router.help(message, config);
                 break;
             // !raid [venue] [time] [timer] [quorum]
             case 'raid':
-                console.log('checkpoint 1');
                 var raid = router.createRaid(message, args);
-                console.log('checkpoint 2');
-                router.announceRaid(raid).then(raidWithMessage => {
-                    console.log('checkpoint 3');
-                    router.timerRaid(raidWithMessage);
+                router.announceRaid(raid, config).then(raidWithMessage => {
+                    router.timerRaid(raidWithMessage, config);
                 });
                 break;
             default:
