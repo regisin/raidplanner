@@ -1,25 +1,28 @@
 const Discord = require("discord.js");
 
 exports.createRaid = function(message, args) {
-    if (args.length > 4) {
+    if (args.length > 5) {
         message.reply("too many arguments!");
         return false;
-    }else if (args.length < 2) {
+    }else if (args.length < 3) {
         message.reply("not enough arguments!");
         return false;
     }else{
         const where = args[0];
-        const when = args[1];
+        const pokemon = args[1];
+        const when = args[2];
         let timer = 45;
         let quorum = 6;
-        if (args.length >= 3) {
-            timer = parseInt(args[2]);
-            if (args.length == 4) quorum = parseInt(args[3]);
+        if (args.length >= 4) {
+            timer = parseInt(args[3]);
+            console.log('asdfgdfhjfds',args.length);
+            if (args.length == 5) quorum = parseInt(args[4]);
         }
         var raid = {
             channel: message.channel,
             owner: message.author,
             venue: where,
+            pokemon: pokemon,
             time: when,
             quorum: quorum,
             timer: timer
@@ -31,6 +34,7 @@ exports.createRaid = function(message, args) {
 exports.announceRaid = function (raid, config) {
     const channel = raid.channel;
     const owner = raid.owner;
+    const pokemon = raid.pokemon;
     const when = raid.time;
     const where = raid.venue;
     const timer = raid.timer;
@@ -41,6 +45,7 @@ exports.announceRaid = function (raid, config) {
         .setTitle("Raid created by: " + owner.username)
         .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
         .addField("Raid info",
+                "__Pokemon__: " + pokemon + "\n"+
                 "__When__: " + when + "\n"+
                 "__Where__: " + where + "\n"+
                 "__Deadline__: " + timer.toString() + " minutes\n"+
@@ -60,6 +65,7 @@ exports.announceRaid = function (raid, config) {
 exports.timerRaid = function (raid, config) {
     const message = raid.message;
     const owner = raid.owner;
+    const pokemon = raid.pokemon;
     const when = raid.time;
     const where = raid.venue;
     const timer = raid.timer;
@@ -89,6 +95,7 @@ exports.timerRaid = function (raid, config) {
             .setTitle("Raid created by: " + owner.username)
             .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
             .addField("Raid info",
+                    "__Pokemon__: " + pokemon + "\n"+
                     "__When__: " + when + "\n"+
                     "__Where__: " + where + "\n"+
                     "__Deadline__: " + timer.toString() + " minutes\n"+
