@@ -11,7 +11,7 @@ exports.createRaid = function(message, args) {
         const where = args[0];
         const pokemon = args[1];
         const when = args[2];
-        let timer = 45;n
+        let timer = 45;
         let quorum = 6;
         if (args.length >= 4) {
             timer = parseInt(args[3]);
@@ -42,7 +42,7 @@ exports.announceRaid = function (raid, config) {
     const embed = new Discord.MessageEmbed()
         .setColor("#FFA500")
         .setTitle("Raid created by: " + owner.username)
-        .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
+        .setDescription("RSVP by clicking: " + config.rsvp_emoji + "\nIf you cannot make it anymore click: " + config.rsvp_emoji_cancel + "\n__*if you do " + config.rsvp_emoji_cancel + " but decide to go, your name won't show up here!*__")
         .addField("Raid info",
                 "__Pokemon__: " + pokemon + "\n"+
                 "__When__: " + when + "\n"+

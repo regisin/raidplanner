@@ -19,10 +19,12 @@ client.on('message', message => {
 
         switch(cmd) {
             // !help
+            case 'h':
             case 'help':
                 router.help(message, config);
                 break;
             // !raid [venue] [time] [timer] [quorum]
+            case 'r':
             case 'raid':
                 var raid = router.createRaid(message, args);
                 router.announceRaid(raid, config).then(raidWithMessage => {
