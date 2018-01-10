@@ -2,8 +2,10 @@
   "name": "raidbot",
   "version": "1.0.0",
   "description": "Bot for discord that helps organize raids for PoGo.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "regisin",

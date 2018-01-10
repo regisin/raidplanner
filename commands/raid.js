@@ -11,11 +11,10 @@ exports.createRaid = function(message, args) {
         const where = args[0];
         const pokemon = args[1];
         const when = args[2];
-        let timer = 45;
+        let timer = 45;n
         let quorum = 6;
         if (args.length >= 4) {
             timer = parseInt(args[3]);
-            console.log('asdfgdfhjfds',args.length);
             if (args.length == 5) quorum = parseInt(args[4]);
         }
         var raid = {
@@ -76,7 +75,7 @@ exports.timerRaid = function (raid, config) {
 
     const collector = message.createReactionCollector(
         (reaction, user) => reaction.emoji.name === config.rsvp_emoji || reaction.emoji.name === config.rsvp_emoji_cancel,
-        { time: raid.timer*10000 }
+        { time: raid.timer*60000 }
     ); // convert to miliseconds
 
     collector.on('collect', reaction => {
