@@ -115,7 +115,7 @@ exports.timerRaid = function (raid, config) {
             });
             message.channel.send(text);
         }else{
-            let text = "Raid is **OFF**! Maybe next time :( ";
+            let text = "Not enough people confirmed, talk among yourselves to decide! ";
             confirmedUsers.forEach(user => {
                 text += user.toString() + " ";
             });
