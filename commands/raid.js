@@ -2,10 +2,16 @@ const Discord = require("discord.js");
 
 exports.createRaid = function(message, args) {
     if (args.length > 5) {
-        message.reply("too many arguments!");
+        message.reply("too many arguments!")
+            .catch( err => {
+                console.log(err);
+            });
         return false;
     }else if (args.length < 3) {
-        message.reply("not enough arguments!");
+        message.reply("not enough arguments!")
+            .catch( err => {
+                console.log(err);
+            });
         return false;
     }else{
         const where = args[0];
@@ -51,14 +57,16 @@ exports.announceRaid = function (raid, config) {
                 "__Quorum needed__: " + quorum.toString() + "\n")
         .addField("Confirmed players", "no one :(");
 
-    return channel.send({embed}).then( raidMessage => {
-        raidMessage.react(config.rsvp_emoji);
-        raidMessage.react(config.rsvp_emoji_cancel);
-        raid.message = raidMessage;
-        return raid;
-    }).catch( err => {
-        console.log(err);
-    });
+    return channel.send({embed})
+                  .then( raidMessage => {
+                    raidMessage.react(config.rsvp_emoji).catch((err)=>{console.log(err);});
+                    raidMessage.react(config.rsvp_emoji_cancel).catch((err)=>{console.log(err);});;
+                    raid.message = raidMessage;
+                    return raid;
+                  })
+                  .catch( err => {
+                    console.log(err);
+                  });
 }
 
 exports.timerRaid = function (raid, config) {
@@ -113,13 +121,17 @@ exports.timerRaid = function (raid, config) {
                 // console.log('user:', user);
                 text += user.toString() + " ";
             });
-            message.channel.send(text);
+            message.channel.send(text).catch( err => {
+                console.log(err);
+        });
         }else{
             let text = "Not enough people confirmed, talk among yourselves to decide! ";
             confirmedUsers.forEach(user => {
                 text += user.toString() + " ";
-            });
-            message.channel.send(text);
+            }); 
+            message.channel.send(text).catch( err => {
+                console.log(err);
+        });
         }
     });
 }

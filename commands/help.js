@@ -13,8 +13,12 @@ exports.help = function(message, config) {
             "**timer**: optional - how long (minutes) this raid request is open for (1-45); default 45\n"+
             "**minimum**: optional - number of players needed; default 5")
         .addBlankField()
+        .addField("__**Upload gym screenshot via DM**__","*Estimates badge xp needed*")
+        .addBlankField()
         .addField("!help or !h", "*Displays this message*");
     
-    message.channel.send({embed});
+    message.channel.send({embed}).catch( err => {
+        console.log(err);
+});
     return;
 }
