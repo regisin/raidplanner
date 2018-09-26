@@ -1,19 +1,19 @@
 const Discord = require("discord.js");
 
-exports.createRaid = function(message, args) {
+exports.createRaid = function (message, args) {
     if (args.length > 5) {
         message.reply("too many arguments!")
-            .catch( err => {
+            .catch(err => {
                 console.log(err);
             });
         return false;
-    }else if (args.length < 3) {
+    } else if (args.length < 3) {
         message.reply("not enough arguments!")
-            .catch( err => {
+            .catch(err => {
                 console.log(err);
             });
         return false;
-    }else{
+    } else {
         const where = args[0];
         const pokemon = args[1];
         const when = args[2];
@@ -45,28 +45,28 @@ exports.announceRaid = function (raid, config) {
     const timer = raid.timer;
     const quorum = raid.quorum;
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new Discord.RichEmbed()
         .setColor("#FFA500")
         .setTitle("Raid created by: " + owner.username)
         .setDescription("RSVP by clicking: " + config.rsvp_emoji + "\nIf you cannot make it anymore click: " + config.rsvp_emoji_cancel + "\n__*if you do " + config.rsvp_emoji_cancel + " but decide to go, your name won't show up here!*__")
         .addField("Raid info",
-                "__Pokemon__: " + pokemon + "\n"+
-                "__When__: " + when + "\n"+
-                "__Where__: " + where + "\n"+
-                "__Deadline__: " + timer.toString() + " minutes\n"+
-                "__Quorum needed__: " + quorum.toString() + "\n")
+            "__Pokemon__: " + pokemon + "\n" +
+            "__When__: " + when + "\n" +
+            "__Where__: " + where + "\n" +
+            "__Deadline__: " + timer.toString() + " minutes\n" +
+            "__Quorum needed__: " + quorum.toString() + "\n")
         .addField("Confirmed players", "no one :(");
 
-    return channel.send({embed})
-                  .then( raidMessage => {
-                    raidMessage.react(config.rsvp_emoji).catch((err)=>{console.log(err);});
-                    raidMessage.react(config.rsvp_emoji_cancel).catch((err)=>{console.log(err);});;
-                    raid.message = raidMessage;
-                    return raid;
-                  })
-                  .catch( err => {
-                    console.log(err);
-                  });
+    return channel.send({ embed })
+        .then(raidMessage => {
+            raidMessage.react(config.rsvp_emoji).catch((err) => { console.log(err); });
+            raidMessage.react(config.rsvp_emoji_cancel).catch((err) => { console.log(err); });;
+            raid.message = raidMessage;
+            return raid;
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }
 
 exports.timerRaid = function (raid, config) {
@@ -83,55 +83,68 @@ exports.timerRaid = function (raid, config) {
 
     const collector = message.createReactionCollector(
         (reaction, user) => reaction.emoji.name === config.rsvp_emoji || reaction.emoji.name === config.rsvp_emoji_cancel,
-        { time: raid.timer*60000 }
+        { time: raid.timer * 60000 }
     ); // convert to miliseconds
 
     collector.on('collect', reaction => {
         if (reaction.emoji.name === config.rsvp_emoji) {
             usersThatSaidYes = Array.from(reaction.users.values());
-        }else if (reaction.emoji.name === config.rsvp_emoji_cancel) {
+        } else if (reaction.emoji.name === config.rsvp_emoji_cancel) {
             usersThatSaidNo = Array.from(reaction.users.values());
         }
         //update users in raid calling msg
-        const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0 );
+        const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0);
         let text = "> ";
-        confirmedUsers.forEach(user => text += " " + user.username);
+        confirmedUsers.forEach(user => {
+            const guild = message.guild;
+            const member = guild.members.get(user.id);
+            let level = '';
+            for (let index = 0; index < config.roles.length; index++) {
+                const roleName = config.roles[index];
+                // console.log('roleName:', roleName);
+                if (member.roles.find(r => r.name === roleName)) {
+                    level = roleName;
+                    break;
+                }
+            }
+            text += " " + user.username + "<" + level + ">";
+        });
 
-        const embed = new Discord.MessageEmbed()
+        const embed = new Discord.RichEmbed()
             .setColor("#FFA500")
             .setTitle("Raid created by: " + owner.username)
-            .setDescription("RSVP by clicking: "+config.rsvp_emoji+"\nIf you cannot make it anymore click: "+config.rsvp_emoji_cancel+"\n__*if you do "+config.rsvp_emoji_cancel+" but decide to go, your name won't show up here!*__")
+            .setDescription("RSVP by clicking: " + config.rsvp_emoji + "\nIf you cannot make it anymore click: " + config.rsvp_emoji_cancel + "\n__*if you do " + config.rsvp_emoji_cancel + " but decide to go, your name won't show up here!*__")
             .addField("Raid info",
-                    "__Pokemon__: " + pokemon + "\n"+
-                    "__When__: " + when + "\n"+
-                    "__Where__: " + where + "\n"+
-                    "__Deadline__: " + timer.toString() + " minutes\n"+
-                    "__Quorum needed__: " + quorum.toString() + "\n")
+                "__Pokemon__: " + pokemon + "\n" +
+                "__When__: " + when + "\n" +
+                "__Where__: " + where + "\n" +
+                "__Deadline__: " + timer.toString() + " minutes\n" +
+                "__Quorum needed__: " + quorum.toString() + "\n")
             .addField("Confirmed players", text);
-        message.edit({embed}).catch( err => {
-                console.log(err);
+        message.edit({ embed }).catch(err => {
+            console.log(err);
         });
     });
 
     collector.on('end', collectedItems => {
-        const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0 );
+        const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0);
         if (confirmedUsers.length >= parseInt(raid.quorum)) {
             let text = "Raid is **ON**! Good luck! ";
             confirmedUsers.forEach(user => {
                 // console.log('user:', user);
                 text += user.toString() + " ";
             });
-            message.channel.send(text).catch( err => {
+            message.channel.send(text).catch(err => {
                 console.log(err);
-        });
-        }else{
+            });
+        } else {
             let text = "Not enough people confirmed, talk among yourselves to decide! ";
             confirmedUsers.forEach(user => {
                 text += user.toString() + " ";
-            }); 
-            message.channel.send(text).catch( err => {
+            });
+            message.channel.send(text).catch(err => {
                 console.log(err);
-        });
+            });
         }
     });
 }

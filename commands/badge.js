@@ -63,7 +63,7 @@ exports.appraise = function (message, image) {
         const hours = Math.floor((remainingBXP-(1440*days) )/60.0);
         const minutes = remainingBXP-(60*hours)-(1440*days);
         const margin = Math.ceil(badges[badgeIndex][1] * (1.0/(totalFilled+totalEmpty)));
-        const embed = new Discord.MessageEmbed()
+        const embed = new Discord.RichEmbed()
                     .setColor("#0000FF")
                     .setDescription("You need **" + remainingBXP + "** (± " + margin + ") BXP, you can:")
                     .addField("Win **" + raids + "** raid(s)\n"+
