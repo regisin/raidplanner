@@ -47,14 +47,14 @@ exports.announceRaid = function (raid, config) {
 
     const embed = new Discord.RichEmbed()
         .setColor("#FFA500")
-        .setTitle("Raid created by: " + owner.username)
+        .setTitle("Raid created by: " + channel.guild.members.get(owner.id))
         .setDescription("RSVP by clicking: " + config.rsvp_emoji + "\nIf you cannot make it anymore click: " + config.rsvp_emoji_cancel + "\n__*if you do " + config.rsvp_emoji_cancel + " but decide to go, your name won't show up here!*__")
         .addField("Raid info",
             "__Pokemon__: " + pokemon + "\n" +
-            "__When__: " + when + "\n" +
+            "__Lobby Start Time__: " + when + "\n" +
             "__Where__: " + where + "\n" +
-            "__Deadline__: " + timer.toString() + " minutes\n" +
-            "__Quorum needed__: " + quorum.toString() + "\n")
+            "__RSVP Deadline__: " + timer.toString() + " minutes\n" +
+            "__Trainers Needed__: " + quorum.toString() + "\n")
         .addField("Confirmed players", "no one :(");
 
     return channel.send({ embed })
@@ -71,7 +71,9 @@ exports.announceRaid = function (raid, config) {
 
 exports.timerRaid = function (raid, config) {
     const message = raid.message;
+    const guild = message.guild;
     const owner = raid.owner;
+    const ownerMember = guild.members.get(owner.id);
     const pokemon = raid.pokemon;
     const when = raid.time;
     const where = raid.venue;
@@ -96,7 +98,6 @@ exports.timerRaid = function (raid, config) {
         const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0);
         let text = "> ";
         confirmedUsers.forEach(user => {
-            const guild = message.guild;
             const member = guild.members.get(user.id);
             let level = '';
             for (let index = 0; index < config.roles.length; index++) {
@@ -107,19 +108,19 @@ exports.timerRaid = function (raid, config) {
                     break;
                 }
             }
-            text += " " + user.username + "<" + level + ">";
+            text += " " + member.displayName + "<" + level + ">";
         });
 
         const embed = new Discord.RichEmbed()
             .setColor("#FFA500")
-            .setTitle("Raid created by: " + owner.username)
+            .setTitle("Raid created by: " + ownerMember.displayName)
             .setDescription("RSVP by clicking: " + config.rsvp_emoji + "\nIf you cannot make it anymore click: " + config.rsvp_emoji_cancel + "\n__*if you do " + config.rsvp_emoji_cancel + " but decide to go, your name won't show up here!*__")
             .addField("Raid info",
                 "__Pokemon__: " + pokemon + "\n" +
-                "__When__: " + when + "\n" +
+                "__Lobby Start Time__: " + when + "\n" +
                 "__Where__: " + where + "\n" +
-                "__Deadline__: " + timer.toString() + " minutes\n" +
-                "__Quorum needed__: " + quorum.toString() + "\n")
+                "__RSVP Deadline__: " + timer.toString() + " minutes\n" +
+                "__Trainers Needed__: " + quorum.toString() + "\n")
             .addField("Confirmed players", text);
         message.edit({ embed }).catch(err => {
             console.log(err);
