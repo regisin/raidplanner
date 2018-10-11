@@ -130,7 +130,7 @@ exports.timerRaid = function (raid, config) {
     collector.on('end', collectedItems => {
         const confirmedUsers = usersThatSaidYes.filter(user => usersThatSaidNo.indexOf(user) < 0);
         if (confirmedUsers.length >= parseInt(raid.quorum)) {
-            let text = "Raid is **ON**! Good luck! ";
+            let text = "Raid is **ON** at **"+ raid.venue +"** at **"+raid.time+"**! Good luck! ";
             confirmedUsers.forEach(user => {
                 // console.log('user:', user);
                 text += user.toString() + " ";

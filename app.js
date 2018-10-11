@@ -32,6 +32,7 @@ client.on('message', message => {
                     router.timerRaid(raidWithMessage, config);
                 });
                 break;
+            //!statistics
             case 's':
             case 'statistic':
             case 'statistics':
@@ -39,22 +40,7 @@ client.on('message', message => {
             case 'stats':
                 if (message.channel.type == "dm") {
                     if (message.author.id == process.env.OWNER_ID) {
-                        const servers = client.guilds.array().length;
-                        const channels = client.channels.array().length;
-                        const ping = client.ping;
-                        const lastReady = client.readyTimestamp;
-                        const uptime = client.uptime;
-                        const embed = new Discord.MessageEmbed()
-                            .setColor("#00FFFF")
-                            .setDescription("My Discord stats:")
-                            .addField("Total servers: **" + servers + "**\n" +
-                                "Total channels: **" + channels + "**\n" +
-                                "Uptime (minutes): **" + (uptime * .001) / 60 + "**\n" +
-                                "Avg. heartbeat **" + ping + "**\n" +
-                                "Last ready state timestamp: **" + lastReady + "**",
-                                "*Done.*");
-                        message.reply(embed);
-
+                        router.stats(client, message);
                     }
                 }
                 break;
